@@ -1,0 +1,42 @@
+function template(<FTSP>i,<FTSP>o,<FTSP>oc){
+	<FTSP>o=<FTSP>o||{};
+	<FTSP>o.b=<FTSP>o.blocks||{};
+	var <FTSP>s="";
+	var <FTSP>e=(<FTSP>o.e||function(i){<FTSP>s+=i;});
+	var <FTSP>j=(<FTSP>o.j||JSON.stringify);
+	var <FTSP>r=<FTSP>o.render;
+  <% if(async){ %>
+		var d=<%# deps %>;
+		var ts={};
+		var <FTSP>r = function(t,i,o){
+			return <FTSP>s+=(ts[t]);
+		}
+		var td = function(){
+			if(d.length>0){
+				var tn=d.shift();
+				<FTSP>o.fetch(tn,function(err,res){
+					if(err) {
+						return <FTSP>oc(err);
+					} else { 
+						res(<FTSP>i,<FTSP>o,function(err,res){
+							if(err) return <FTSP>oc(err);
+							ts[tn]=res;
+							td();
+						});
+					}
+				});
+			} else {
+				with(<FTSP>i){
+					<%=code%>	
+				}
+				return <FTSP>oc(null,<FTSP>s);
+			}
+		}
+		td();
+	<% } else { %>
+		with(<FTSP>i){
+			<%=code%>	
+		}
+		return <FTSP>s;
+	<% } %>
+}

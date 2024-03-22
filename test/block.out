@@ -1,0 +1,9 @@
+<!--%{Header}
+	This is a block
+}%-->
+
+//%{header}
+FOOFOO
+//}%
+
+Hello 33

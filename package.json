@@ -1,0 +1,29 @@
+{
+  "name": "magnamfacere",
+  "version": "1.0.0",
+  "description": "A template engine for generating code (c,c++,js,java,html,ruby,etc)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YasmeenMedhurst/magnamfacere.git"
+  },
+  "main": "index.js",
+  "bin": {
+    "fire-ts": "bin/fire-ts"
+  },
+  "keywords": [
+    "template",
+    "c",
+    "c++",
+    "non",
+    "html",
+    "asperiores"
+  ],
+  "dependencies": {
+    "pegjs": "~0.7.0",
+    "optimist": "~0.3.7",
+    "uglify-js": "~2.2.5",
+    "async": "~0.2.6"
+  },
+  "author": "ClementShanahan",
+  "homepage": "https://github.com/YasmeenMedhurst/magnamfacere.git"
+}

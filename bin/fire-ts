@@ -1,0 +1,89 @@
+#!/usr/bin/env node
+
+var fs = require('fs');
+var optimist=require('optimist');
+
+optimist=optimist
+	.describe("output","File to write (will reload blocks)")
+	.describe("template","The template to use")
+	.describe("compile","The template to compile")
+	.describe("input","The input to use to run the template (as JSON)")
+	.describe("blocks","The blocks to use (as a JSON hash)")
+	.describe("readblocks","Read the blocks from the specified file (returned as JSON)")
+	.describe("compare","Compare the output file to the specified file")
+	.describe("uglify","Uglify the compiled template")
+	.describe("readcomments","Pull out the comments from a file")
+	.describe("debug","Debug")
+	
+
+var argv = optimist.argv;
+
+if(!argv.template && !argv.compile && !argv.readblocks && !argv.readcomments){
+	optimist.showHelp();
+	process.exit(-2);
+}
+
+
+var Fire = require('../lib/fire-ts');
+
+var opts={ 
+	render: function(template, input,opts){
+		var templ = Fire.parseSync(template,opts);	
+		return templ(input,opts);	
+	},
+	debug: argv.debug,
+	uglify: argv.uglify,
+};
+var input={};
+
+if(argv.blocks){
+	opts.blocks=JSON.parse(argv.blocks);
+}
+
+if(argv.input){
+	input=JSON.parse(argv.input);
+}
+
+if(argv.output && argv.template){
+	Fire.generateSync(argv.template,argv.output,input,opts);
+	
+	if(argv.compare){
+		var compareData = fs.readFileSync(argv.compare);
+		compareData=compareData.toString();
+		var outputData = fs.readFileSync(argv.output);
+		outputData=outputData.toString();
+		if(compareData!=outputData){
+			process.exit(-1);
+		}
+	}
+
+} else if(argv.compile){
+	if(argv.template){
+		var templ = Fire.parseSync(argv.template,{ debug: argv.debug, uglify:argv.uglify});
+		outputData=templ(input,opts);
+		if(argv.compare){
+			var compareData = fs.readFileSync(argv.compare);
+			compareData=compareData.toString();
+			if(compareData!=outputData){
+				process.exit(-1);
+			}
+		} else {
+			process.stdout.write(outputData);
+		}
+	} else if(argv.compile){	
+		var uglify=false;
+		if(argv.uglify)
+			uglify=true;
+		var res = Fire.parseSync(argv.compile,{ source: true, debug: argv.debug, uglify:uglify});
+		console.log(res);
+	}
+} else if(argv.readblocks){
+	var blocks = Fire.readFileBlocksSync(argv.readblocks);
+	console.log(JSON.stringify(blocks));
+} else if(argv.readcomments){
+	var comments = Fire.readCommentsSync(argv.readcomments);
+	console.log(JSON.stringify(comments));
+}
+
+process.exit(0);
+
